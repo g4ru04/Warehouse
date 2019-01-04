@@ -1,0 +1,21 @@
+index.js:
+var ht_api_dict = require('../service/fake_ht_api.js', 'utf-8');
+
+router.post('/api', async function(req, res, next) {
+	
+	//let data = await call_api.HT_Api(req.body);
+	//ht_api_dict[JSON.stringify(req.body)]=data;
+	let data={};
+	if(ht_api_dict[JSON.stringify(req.body)]!=null){
+	 data= ht_api_dict[JSON.stringify(req.body)];
+	}
+	console.log(ht_api_dict[JSON.stringify(req.body)]);
+	console.log(JSON.stringify(data));
+	res.send(data);
+});
+
+cs_manager.ejs:37
+81344
+
+cs_sustomer.js:127
+$('#password').val('76446');

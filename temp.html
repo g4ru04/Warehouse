@@ -1,0 +1,58 @@
+<script src="./jquery-1.12.4.min.js"></script>
+<script>
+function searchExample(intent){
+	if($("#example_table").length==0){
+		$("body").append("<div id='container' style='border-radius:5px;position: fixed;overflow-y:scroll;z-index: 100;right: 20px;top: 20px;background-color: #ccc;padding: 16px 0px 16px 16px;display:none;'>"
+		+"<div><a href='#'><div style='top:50px;right: 50px;position: fixed;background-color: #eee;border-radius: 8px;padding: 4px 8px;' onclick='$(\"#container\").hide();'>X</div></a></div>"
+		+"<div style='max-height:calc( 80vh );padding-right:20px;'><table id='example_table' style=''><caption></caption><thead></thead><tbody></tbody></div></div>");
+	}
+
+	$.ajax({
+		type: "GET",
+		url: "https://gateway.watsonplatform.net/assistant/api/v1/workspaces/23fff1b0-c437-48ff-993a-4f3bcfe86255/intents/"+intent+"/examples?version=2018-09-20&export=true",
+		//headers: {'Content-Type':'application/json'},
+		contentType: 'application/json; charset=UTF-8',
+		dataType: 'json',
+		beforeSend: function (xhr) {
+			xhr.setRequestHeader ("Authorization", "Basic NDAwM2FlZmMtNzlmOC00YzE0LWE0OTctZjcyMDgyOWRhNGYwOlpZcVp2Vm5ndHhhWA==");
+		},
+		success: function (data){
+			console.log(data);
+			let tbody_str = data.examples.map(function(item,i){
+				return "<tr><td>"+(i+1)+"</td><td>"+item.text+"</td><td><button onclick='deleteExample(\""+intent+"\",\""+item.text+"\")'>刪除</button></td></tr>"
+			}).join("");
+			$("#example_table caption").html(intent);
+			$("#example_table thead").html("<tr><th>-</th><th>範例</th><th>刪除</th></tr>");
+			$("#example_table tbody").html(tbody_str);
+			$("#container").show();
+		}
+	});
+}
+function deleteExample(intent,sentence){
+	if(confirm("真要將 '"+sentence+"' 自 '"+intent+"' 刪除嗎?")){
+		$.ajax({
+			type: "DELETE",
+			url: "https://gateway.watsonplatform.net/assistant/api/v1/workspaces/23fff1b0-c437-48ff-993a-4f3bcfe86255/intents/"+intent+"/examples/"+sentence+"?version=2018-09-20&export=true",
+			//headers: {'Content-Type':'application/json'},
+			contentType: 'application/json; charset=UTF-8',
+			dataType: 'json',
+			beforeSend: function (xhr) {
+				xhr.setRequestHeader ("Authorization", "Basic NDAwM2FlZmMtNzlmOC00YzE0LWE0OTctZjcyMDgyOWRhNGYwOlpZcVp2Vm5ndHhhWA==");
+			},
+			success: function (data){
+				searchExample(intent);
+			}
+		});
+	}
+}
+</script>
+<script>
+$(function(){
+	console.log($("a"));
+	$("a").each(function(item,i){
+		let intnet_txt = $(this).text();
+		$(this).parent().html("<button onclick='searchExample(\""+intnet_txt+"\")'>看範例</button>");
+	});
+	//searchExample("故障詢問_Hybrid系統_Hybrid");
+});
+</script>
