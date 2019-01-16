@@ -1,0 +1,334 @@
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml">
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="description" content="喵喵喵!" />
+<meta name='image' content='http://cdn.illu.es/static/images/ACCDA47B-C2EC-AA3D-15E9-0060C0354E1A.png' />
+<link rel="image_src" href='http://cdn.illu.es/static/images/ACCDA47B-C2EC-AA3D-15E9-0060C0354E1A.png' />
+<meta property="og:image" content="http://cdn.illu.es/static/images/ACCDA47B-C2EC-AA3D-15E9-0060C0354E1A.png" />
+<meta property="og:image:type" content="image/png" />
+<meta property="og:image:width" content="720" />
+<meta property="og:image:height" content="379" />
+<meta property="og:title" content="阿本留言板" />
+<meta property="og:description" content="喵喵喵!" />
+<!--meta property="og:url" content="http://pics.ee/DLX99" /-->
+<meta name="twitter:image:src" content="http://cdn.illu.es/static/images/ACCDA47B-C2EC-AA3D-15E9-0060C0354E1A.png">
+<meta name="author" content="xh.5156edu.com" />
+<meta name="twitter:card" content="summary_large_image">
+<meta name="twitter:site" content="xh.5156edu.com">
+<meta name="twitter:title" content="阿本留言板">
+<meta name="twitter:description" content="喵喵喵!">
+<meta name="twitter:domain" content="xh.5156edu.com">
+
+<meta itemprop="name" content="阿本留言板">
+<meta itemprop="image" content="http://cdn.illu.es/static/images/ACCDA47B-C2EC-AA3D-15E9-0060C0354E1A.png">
+<meta itemprop="description" content="喵喵喵!">
+<link rel="stylesheet" href="https://code.jquery.com/ui/1.12.1/themes/base/jquery-ui.css">
+<script src="https://code.jquery.com/jquery-1.12.4.min.js"></script>
+<script src="https://code.jquery.com/ui/1.12.0/jquery-ui.min.js"></script>
+<title>阿本留言板</title>
+<style type="text/css">
+body{
+        margin: 0px;
+        padding: 0px;
+}
+a, a:link, a:hover{
+        text-decoration: none;
+        color: #06F;
+}
+.navigation{
+        background-color: #ecd356;
+        padding: 10px;
+}
+.logo{
+        height: 40px;
+        width: 40px;
+        display: inline-block;
+        background-size: cover;
+}
+.navigation a{
+        color: #090f2d;
+        font-weight: bold;
+        text-decoration: none;
+        font-size: 25px;
+        text-align: center;
+        font-style: italic;
+}
+p{
+	margin:2px 6px;
+	padding:4px;
+}
+p img{
+        width: 100%;
+}
+.suggest{
+        background-color: #EFEFEF;
+}
+.thumbnail{
+        width: 400px;
+    height: 250px;
+    display: block;
+    background-size: cover;
+    background-position: center;
+}
+.footer{
+        background-color: #182e4e;
+        display: block;
+        height: 50px;
+        color: #FFF;
+}
+#box{
+	opacity:0.001;
+	height:1px;
+	overflow:hidden;
+	display:none;
+}
+#board{
+	height:calc( 100vh - 160px );
+}
+</style>
+	<script>
+	    /*setTimeout(function(){
+			let url_para = "";
+			if(window.location.href.split("?").length>1){
+				url_para= "?"+window.location.href.split("?")[1];
+			}
+	        window.location.href = "./read_train_lexus_redirect"+url_para;
+	    },20);*/
+		function read_textarea_board(){
+			$.ajax({
+				type: "POST",
+				url: "https://g4ru04.mybluemix.net/get_comment",
+				dataType: 'json',
+				success: function (data) {
+					let message_arr = data;
+					message_arr = message_arr.sort(function(a,b){
+						return a.timestamp-b.timestamp;
+					})
+					let message_str = message_arr.map(function(item){
+						if (!!navigator.userAgent.match(/android/i)) {
+							return item.time.replace(" ","-")+"：\n　　"+item.text;
+						}else{
+							return item.time.replace(" ","-")+" > "+item.text+ "\t("+item.ip+")";
+						}
+					}).join("\n")
+					$("#board").val(message_str);
+					console.log(data);
+					$("#board").scrollTop($("#board").prop("scrollHeight"));
+					$("#message").focus();
+					//alert(data);
+				}
+			});
+		}
+		function read_p_board(){
+			$.ajax({
+				type: "POST",
+				url: "https://g4ru04.mybluemix.net/get_comment",
+				dataType: 'json',
+				success: function (data) {
+					let message_arr = data;
+					message_arr = message_arr.sort(function(a,b){
+						return a.timestamp-b.timestamp;
+					});
+					
+					let message_str = "<p>"+message_arr.map(function(item){
+						let last_sec = item.text.split(" ").pop();
+						let tmp_arr = item.text.split(" ");
+						tmp_arr.pop();
+						let last_2_sec = tmp_arr.pop();
+						last_2_sec = last_2_sec?last_2_sec:"";
+						
+						let edit_text = item.text;
+						
+						if(last_sec.startsWith("http")){
+							edit_text = edit_text.replace(last_sec,"&nbsp;&nbsp;&nbsp;&nbsp;<a href='"+last_sec+"' title='"+last_sec+"' target='_blank' >"+(last_sec.indexOf("https://g4ru04.mybluemix.net/get_file/")!=-1?"附檔":"連結")+"</a>")
+						}
+						if(last_2_sec.startsWith("http")){
+							edit_text = edit_text.replace(last_2_sec,"&nbsp;&nbsp;&nbsp;&nbsp;<a href='"+last_2_sec+"' title='"+last_2_sec+"' target='_blank' >"+(last_2_sec.indexOf("https://g4ru04.mybluemix.net/get_file/")!=-1?"附檔":"連結")+"</a>")
+						}
+						
+						let del_str = "<button style='' _id='"+item._id+"' _rev='"+item._rev+"' txt='"+item.text+"' class='board_msg_del'>刪除</button>";
+						
+						if (!!navigator.userAgent.match(/android/i)) {
+							return item.time.replace(" ","-")+"：<br>　　"+edit_text;
+						}else{
+							return item.time.replace(" ","-")
+											+" > "+edit_text
+											+ "<span style='float:right'>("+item.ip+")&nbsp;&nbsp;"+del_str+"</span>";
+						}
+					}).join("</p><p>")+"</p><p>&nbsp;</p>";
+					$("#board").html(message_str);
+					//$("#board").val(message_str);
+					console.log(data);
+					$("#board").scrollTop($("#board").prop("scrollHeight"));
+					$("#message").focus();
+					//alert(data);
+				}
+			});
+		}
+		function read_board(){
+			read_p_board();
+		}
+		
+		function send_message(){
+			
+			let attachement = "";
+			if($("#file_name").attr("url") && $("#file_name").attr("url").length>0){
+				attachement = " "+$("#file_name").attr("url");
+				$("#file_name").attr("url",'');
+				$("#file_name").hide();
+				$("#file_label").show();
+			}
+			$.ajax({
+				type: "POST",
+				url: "https://g4ru04.mybluemix.net/set_comment",
+				data:{
+					text: $("#message").val()+attachement,
+					timestamp: Date.now(),
+					time: new Date(Date.now()+8*3600*1000).toISOString().replace(/-/g,"/").replace("T"," ").split(".")[0]
+				},
+				success: function (data) {
+					$("#message").val('');
+					read_board();
+					console.log(data);
+					//alert(data);
+				}
+			});
+		}
+		function upload_file(){
+			if(
+				!$('#file')||
+				!$('#file')[0]||
+				!$('#file')[0].files||
+				!$('#file')[0].files[0]
+			){
+				return ;
+			}
+			
+			var formData = new FormData();
+			formData.append('file', $('#file')[0].files[0]);
+			$.ajax({
+				url: 'https://g4ru04.mybluemix.net/store_file',
+				type: 'POST',
+				cache: false,
+				data: formData,
+				processData: false,
+				contentType: false
+			}).done(function(res) {
+			    $("#file_name").attr("url",res);
+				$("#file_name").html($('#file')[0].files[0].name);
+				$("#file_name").show();
+				$("#file_label").hide();
+			}).fail(function(res) {});
+		}
+		function warningMsg(title, msg, buttons) {
+			if($('.all')) $('.all').show()
+			$("<div id='warning'/>").html(msg).dialog({
+				title: title,
+				draggable : false, resizable : false, autoOpen : true,
+				height : "auto", width : "80%", modal : true,
+				buttons : buttons ? buttons:[{
+					text: "確定", 
+					click: function() { 
+						$(this).dialog("close");
+						
+						if($('.all')) $('.all').hide();
+					}
+				}],
+				create: function( event, ui ) {
+					$(this).parent().children().on('touchmove', function(e){
+						e.preventDefault();
+					})
+				}
+			});
+		}
+    </script>
+</head>
+<body data-mobile-mode="yep" data-showing-advertisement="none">
+	<div id="box">
+			<div class="navigation">
+					<a href="./">
+							<div class=logo style="background-image:url(https://statics.518.com.tw/img/startup/picsee/logo1.png)" title="se.piee.pw"></div>
+							se.piee.pw                      </a>
+			</div>
+			<h1>阿本留言板</h1>
+			<p>
+					<a href="http://xh.5156edu.com/page/z1015m9220j18754.html"><img title="阿本留言板" src="http://cdn.illu.es/static/images/ACCDA47B-C2EC-AA3D-15E9-0060C0354E1A.png" alt="阿本留言板" border=0 ></a>
+					<br />
+					喵喵喵!喵喵喵!喵喵喵!                </p>
+			<div class="suggest">
+			</div>
+			<div class="footer"><a href="https://picsee.co/" target="_blank">PicSee</a>- Shorten URL customize/big preview image (thumbnails) of share link, large preview of YouTube on Facebook, 自訂分享連結圖片短網址，YouTube大圖顯示在Facebook上 短网址on Twitter, LinkedIn</div>
+	</div>
+	
+	<table>
+		<tr>
+			<td>
+				<input id='message' style='padding:4px 6px; height:18px;width:500px;max-width:calc( 100vw - 120px );margin:12px;'/>&nbsp;&nbsp;
+				<button onclick='send_message()'>送出</button>&nbsp;&nbsp;<a href='./msg_textarea_bd'>textarea版</a>&nbsp;&nbsp;
+				<span id="uploadForm">
+				  <label for="file" id='file_label' class="btn" style='cursor:pointer;padding:8px 12px;background-color:#ccc;border:1px solid #000;border-radius:5px;' onclick="document.getElementById('file').click()">上傳檔案</label>
+				  <input id="file" style="display:none;" type="file" />
+				  <span id="file_name" style="display:none;"  ></span>
+				</span>
+			</td>
+		</tr>
+		<tr>
+			<td colspan='2'>
+			    <div id='board' style='border:2px solid #aaa;border-radius:5px;padding:12px 8px;background-color:#eee;width:calc( 100vw - 30px );overflow-y:auto;'></div>
+				<!--textarea id='board' style='background-color:#eee;width:calc( 100vw - 30px );overflow-y:auto;' readonly='readonly' ></textarea-->
+			</td>
+		</tr>
+	</table>
+	<script>
+	$(function(){
+		$("#message").on('keypress',function(e) {
+			if(e.which == 13) {
+				send_message();
+			}
+		});
+		$("#file").change(function() {
+		  filename = this.files[0].name
+		  upload_file();
+		  alert(filename);
+		});
+		
+		$("#board").delegate(".board_msg_del","click",function(e){
+			let _id = $(this).attr("_id");
+			let _rev = $(this).attr("_rev");
+			let txt = $(this).attr("txt");
+			warningMsg("警告","確定永久刪除此則留言?<br>"+txt,[{
+					text: "確定", 
+					click: function() { 
+						$.ajax({
+							type: "POST",
+							url: "https://g4ru04.mybluemix.net/del_comment",
+							data:{
+								_id:_id,
+								_rev: _rev
+							},success:function(res){
+								console.log("成功刪除");
+								read_board();
+							}
+						});
+						$(this).dialog("close");
+					}
+				},{
+					text: "取消", 
+					click: function() { 
+						$(this).dialog("close");
+					}
+				}])
+		});
+		
+		
+		read_board();
+		setInterval(function(){
+			read_board();
+		},60*1000);
+		$("#board").height($("#board").height());
+	});
+	</script>
+</body>
+</html>  
